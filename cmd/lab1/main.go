@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
 	"gonum.org/v1/plot/plotutil"
@@ -19,13 +20,14 @@ func f(x float64) float64 {
 	return v_max
 }
 
-func main() {
+func p1() {
+	// Create a plot
 	p := plot.New()
-	
 	p.Title.Text = "Graph of f(x)"
 	p.X.Label.Text = "x"
 	p.Y.Label.Text = "y"
 
+	// Generate data points with f(x)
 	pts := make(plotter.XYs, 100)
 	for i := - 10; i < pts.Len() - 10; i++ {
 		pts[i+10].X = float64(i)
@@ -38,4 +40,17 @@ func main() {
 	if err := p.Save(4*vg.Inch, 4*vg.Inch, "problem1.png"); err != nil {
 		panic(err)
 	}
+}
+
+func p2() {
+
+}
+
+func run_all() {
+	fmt.Println("Running problem 1"); p1()
+	fmt.Println("Running problem 2"); p2()
+}
+
+func main() {
+	run_all()
 }
