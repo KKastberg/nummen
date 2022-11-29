@@ -20,8 +20,9 @@ const d float64 = 75; 			// Max distance between cars [m]
 const M int = 10				    // Count of cars [cars]
 const h float64 = 0.5				// Step size [step]
 const t float64 = 40;		    // Time instant [s]
-const g float64 = 5.0;		  // Speed of first car [m/s]
+const g float64 = 25;		  // Speed of first car [m/s]
 const di float64 = d;		    // Initial distances between cars [m]
+const iterMax int = 10	  	// Max iterations for fixedpoints method
 
 func f(x float64) float64 {
 	if x <= 0 {
@@ -72,6 +73,45 @@ func p2() {
 	plot_position_graphs(allCarPos)
 	generate_car_plots(allCarPos)
 
+}
+
+
+func p7() {
+	const n int = int(t/h)  // Count of steps
+
+	// Generate list of initial car positions
+	carPos := make([]float64, M)
+	for i := 1; i <= M; i++ {			
+		carPos[i - 1] = float64(i) * 10
+	}
+
+	for i := 0; i < n; i++ {
+		nextCarPos := next_time_step(carPos)
+		carPos = nextCarPos
+	}
+}
+
+func next_time_step(carPos []float64) []float64 {
+	nextCarPos := make([]float64, M)
+	nextCarPos[M-1] = carPos[M-1] + h * g
+	for i := M-2; i >= 0; i-- {
+		nextCarPos[i] = next_car_time_step(carPos[i], nextCarPos[i+1])
+	}
+	fmt.Println(nextCarPos)
+	return nextCarPos
+}
+
+func next_car_time_step(carPos float64, nextCarPos float64) float64 {
+  guess := carPos
+	for i := 0; i < iterMax; i++ {
+		//fmt.Println(guess)
+		guess = fixedpoint_iteration(guess, carPos, nextCarPos)
+	}
+	return guess
+}
+
+func fixedpoint_iteration(guess float64, carPos float64, nextCarPos float64) float64 {
+	return carPos + h * f(nextCarPos - guess)
 }
 
 func get_car_speed(carPos float64, nextCarPos float64) float64 {
@@ -192,8 +232,49 @@ func generate_gif() {
 
 func run_all() {
 	// fmt.Println("Running problem 1"); p1()
-	fmt.Println("Running problem 2"); p2()
+	fmt.Println("Running problem 7"); p7()
 }
+
+
+
+
+
+
+
+func p8() {
+	const n int = int(t/h)  // Count of steps
+	allCarPos := make([][]float64, n)		// List of all car positions
+
+	// Generate list of initial car positions
+	carPos := make([]float64, M)
+	for i := 1; i <= M; i++ {			
+		carPos[i - 1] = float64(i) * di
+	}
+
+	// Run Euler's backwords method
+	for i := 0; i < n; i++ {
+		// nextCarPos, _ := euler_back_step_all(carPos)
+		allCarPos[i] = carPos
+		//carPos = nextCarPos
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 func main() {
 	run_all()
