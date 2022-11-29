@@ -17,12 +17,12 @@ import (
 
 const v_max float64 = 25;		// Max speed [m/s]
 const d float64 = 75; 			// Max distance between cars [m]
-const M int = 10				    // Count of cars [cars]
-const h float64 = 0.5				// Step size [step]
+const M int = 10;				    // Count of cars [cars]
+const h float64 = 0.5;				// Step size [step]
 const t float64 = 40;		    // Time instant [s]
-const g float64 = 25;		  // Speed of first car [m/s]
+const g float64 = 5;		  // Speed of first car [m/s]
 const di float64 = d;		    // Initial distances between cars [m]
-const iterMax int = 10	  	// Max iterations for fixedpoints method
+const iterMax int = 10;	  	// Max iterations for fixedpoints method
 
 func f(x float64) float64 {
 	if x <= 0 {
@@ -75,9 +75,41 @@ func p2() {
 
 }
 
+func p8() {
+	const n int = int(t/h)  // Count of steps
+	allCarPos := make([][]float64, n)		// List of all car positions
+
+	// Generate list of initial car positions
+	carPos := make([]float64, M)
+	for i := 1; i <= M; i++ {			
+		carPos[i - 1] = float64(i) * di
+	}
+	fmt.Println(carPos)
+
+	for i := 0; i < n; i++ {
+		nextCarPos := back_euler_step(carPos)
+		allCarPos[i] = carPos
+		carPos = nextCarPos
+	}
+}
+
+func back_euler_step(carPos []float64) []float64 {
+	nextCarPos := make([]float64, M)
+	nextCarPos[M-1] = carPos[M-1] + h * g
+	for i := M-2; i >= 0; i-- {
+		nextCarPos[i] = car_back_euler_step(carPos[i], nextCarPos[i+1])
+	}
+	fmt.Println(nextCarPos)
+	return nextCarPos
+}
+
+func car_back_euler_step(carPos float64, nextCarPos float64) float64 {
+	return (d * carPos + h * v_max * nextCarPos) / (d + h * v_max)
+}
 
 func p7() {
 	const n int = int(t/h)  // Count of steps
+	allCarPos := make([][]float64, n)		// List of all car positions
 
 	// Generate list of initial car positions
 	carPos := make([]float64, M)
@@ -87,6 +119,7 @@ func p7() {
 
 	for i := 0; i < n; i++ {
 		nextCarPos := next_time_step(carPos)
+		allCarPos[i] = carPos
 		carPos = nextCarPos
 	}
 }
@@ -232,47 +265,9 @@ func generate_gif() {
 
 func run_all() {
 	// fmt.Println("Running problem 1"); p1()
-	fmt.Println("Running problem 7"); p7()
+	fmt.Println("Running problem 7"); p8()
+
 }
-
-
-
-
-
-
-
-func p8() {
-	const n int = int(t/h)  // Count of steps
-	allCarPos := make([][]float64, n)		// List of all car positions
-
-	// Generate list of initial car positions
-	carPos := make([]float64, M)
-	for i := 1; i <= M; i++ {			
-		carPos[i - 1] = float64(i) * di
-	}
-
-	// Run Euler's backwords method
-	for i := 0; i < n; i++ {
-		// nextCarPos, _ := euler_back_step_all(carPos)
-		allCarPos[i] = carPos
-		//carPos = nextCarPos
-	}
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
