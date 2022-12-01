@@ -17,7 +17,7 @@ const h float64 = 2.5    // Step size [step]
 const t float64 = 40     // Time instant [s]
 const g float64 = 5      // Speed of first car [m/s]
 const di float64 = d     // Initial distances between cars [m]
-const iterMax int = 4   // Max iterations for fixedpoints method
+const iterMax int = 4    // Max iterations for fixedpoints method
 
 func f(x float64) float64 {
 	if x <= 0 {
@@ -51,8 +51,8 @@ func p1() {
 }
 
 func p2() {
-	var n int = int(math.Round(t / h))          // Count of steps
-	allCarPos := make([][]float64, n) // List of all car positions
+	var n int = int(math.Round(t / h)) // Count of steps
+	allCarPos := make([][]float64, n)  // List of all car positions
 
 	// Generate list of initial car positions
 	carPos := make([]float64, M)
@@ -71,8 +71,8 @@ func p2() {
 }
 
 func p7() {
-	var n int = int(math.Round(t / h))          // Count of steps
-	allCarPos := make([][]float64, n) // List of all car positions
+	var n int = int(math.Round(t / h)) // Count of steps
+	allCarPos := make([][]float64, n)  // List of all car positions
 
 	// Generate list of initial car positions
 	carPos := make([]float64, M)
@@ -114,8 +114,8 @@ func fixedpoint_iteration(guess float64, carPos float64, nextCarPos float64) flo
 }
 
 func p8() {
-	var n int = int(math.Round(t / h))         // Count of steps
-	allCarPos := make([][]float64, n) // List of all car positions
+	var n int = int(math.Round(t / h)) // Count of steps
+	allCarPos := make([][]float64, n)  // List of all car positions
 
 	// Generate list of initial car positions
 	carPos := make([]float64, M)
@@ -134,7 +134,7 @@ func p8() {
 }
 
 func p8v2() {
-	var n int = int(math.Round(t / h))         // Count of steps
+	var n int = int(math.Round(t / h)) // Count of steps
 	max_iter := 50
 	abs_error := make([]float64, max_iter)
 
@@ -161,7 +161,9 @@ func p8v2() {
 		}
 		abs_error[i] = math.Abs(carPos[0] - ground_truth[0])
 	}
+
 	fmt.Println(abs_error)
+	plot_fix_point_error(abs_error)
 }
 
 func back_euler_step(carPos []float64) []float64 {

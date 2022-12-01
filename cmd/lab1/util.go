@@ -44,6 +44,35 @@ func plot_position_graphs(name string, allCarPos [][]float64) {
 	}
 }
 
+func plot_fix_point_error(errors []float64) {
+	p := plot.New()
+	p.Title.Text = "Errors"
+	p.X.Label.Text = "Iterations"
+	p.Y.Label.Text = "Error"
+	p.BackgroundColor = color.Transparent
+	p.Y.Scale = plot.LogScale{}
+
+	// Generate data points with f(x)
+	for i := 0; i < len(errors); i++ {
+
+		pts := make(plotter.XYs, len(errors))
+		pts[i].X = float64(i)
+		pts[i].Y = float64(errors[i])
+
+		line, err := plotter.NewLine(pts)
+		if err != nil {
+			panic(err)
+		}
+		line.Color = color.RGBA{B: uint8(255 * i / M), A: 255, R: uint8(255 - 255*i/M), G: uint8(255/2 + 255*i/M/2)}
+		p.Add(line)
+	}
+
+	// Save the plot to a PNG file.
+	if err := p.Save(5*vg.Inch, 5*vg.Inch, fmt.Sprintf("error_graph.png")); err != nil {
+		panic(err)
+	}
+}
+
 func generate_car_plots(name string, allCarPos [][]float64) {
 	for i := 0; i < len(allCarPos); i++ {
 		p := plot.New()
