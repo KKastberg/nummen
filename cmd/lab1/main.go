@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
@@ -12,8 +13,8 @@ import (
 const v_max float64 = 25 // Max speed [m/s]
 const d float64 = 75     // Max distance between cars [m]
 const M int = 10         // Count of cars [cars]
-const h float64 = 0.1    // Step size [step]
-const t float64 = 40     // Time instant [s]
+const h float64 = 4    // Step size [step]
+const t float64 = 90     // Time instant [s]
 const g float64 = 5      // Speed of first car [m/s]
 const di float64 = d     // Initial distances between cars [m]
 const iterMax int = 10   // Max iterations for fixedpoints method
@@ -50,7 +51,7 @@ func p1() {
 }
 
 func p2() {
-	const n int = int(t / h)          // Count of steps
+	var n int = int(math.Round(t / h))          // Count of steps
 	allCarPos := make([][]float64, n) // List of all car positions
 
 	// Generate list of initial car positions
@@ -70,13 +71,13 @@ func p2() {
 }
 
 func p7() {
-	const n int = int(t / h)          // Count of steps
+	var n int = int(math.Round(t / h))          // Count of steps
 	allCarPos := make([][]float64, n) // List of all car positions
 
 	// Generate list of initial car positions
 	carPos := make([]float64, M)
 	for i := 1; i <= M; i++ {
-		carPos[i-1] = float64(i) * 10
+		carPos[i-1] = float64(i) * di
 	}
 
 	for i := 0; i < n; i++ {
@@ -113,7 +114,7 @@ func fixedpoint_iteration(guess float64, carPos float64, nextCarPos float64) flo
 }
 
 func p8() {
-	const n int = int(t / h)          // Count of steps
+	var n int = int(math.Round(t / h))         // Count of steps
 	allCarPos := make([][]float64, n) // List of all car positions
 
 	// Generate list of initial car positions
