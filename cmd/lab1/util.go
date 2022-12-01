@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"image"
 	"image/color"
+	"image/color/palette"
+	"image/draw"
 	"image/gif"
 	"image/png"
-	"log"
 	"os"
 
 	"gonum.org/v1/plot"
@@ -77,6 +78,7 @@ func plot_fix_point_error(errors []float64) {
 }
 
 func generate_car_plots(name string, allCarPos [][]float64) {
+
 	for i := 0; i < len(allCarPos); i++ {
 		p := plot.New()
 		p.Title.Text = fmt.Sprintf("Car positions (%s)", name)
@@ -100,31 +102,37 @@ func generate_car_plots(name string, allCarPos [][]float64) {
 		}
 
 	}
+
+	generate_gif(name, len(allCarPos))
 }
 
-func generate_gif() {
+func generate_gif(name string, img_count int) {
+	fmt.Println("Generating GIF")
 	// Create a new animated GIF.
 	anim := gif.GIF{LoopCount: 0}
-	for i := 0; i < 80; i++ {
+
+	for i := 0; i < img_count; i++ {
 		// Open the image file.
-		f, err := os.Open(fmt.Sprintf("problem3_%d.png", i))
+		f, err := os.Open(fmt.Sprintf("gif\\%s_%d.png", name, i))
+
 		if err != nil {
-			log.Fatal(err)
+			panic(err)
 		}
+
+		img, err := png.Decode(f)
 		defer f.Close()
 
-		// Decode the image.
-		img, err := png.Decode(f)
 		if err != nil {
-			log.Fatal(err)
+			panic(err)
 		}
 
 		bounds := img.Bounds()
-		palettedImage := image.NewPaletted(bounds, nil)
+		palettedImg := image.NewPaletted(bounds, palette.Plan9)
+		draw.Draw(palettedImg, img.Bounds(), img, image.Point{0, 0}, draw.Src)
 
-		// Append the image to the GIF.
+		anim.Image = append(anim.Image, palettedImg)
 		anim.Delay = append(anim.Delay, 0)
-		anim.Image = append(anim.Image, palettedImage)
+
 	}
 
 	// Write the animated GIF to a file.

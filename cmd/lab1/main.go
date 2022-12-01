@@ -45,7 +45,7 @@ func p1() {
 	plotutil.AddLinePoints(p, "f(x)", pts)
 
 	// Save the plot to a PNG file.
-	if err := p.Save(4*vg.Inch, 4*vg.Inch, "problem1.svg"); err != nil {
+	if err := p.Save(4*vg.Inch, 4*vg.Inch, "uppgift1.png"); err != nil {
 		panic(err)
 	}
 }
@@ -65,8 +65,26 @@ func p2() {
 		carPos = nextCarPos
 	}
 
-	plot_position_graphs("problem 2", allCarPos)
-	generate_car_plots("problem 2", allCarPos)
+	plot_position_graphs("Uppgift2", allCarPos)
+
+}
+
+func p3() {
+	var n int = int(math.Round(t / h)) // Count of steps
+	allCarPos := make([][]float64, n)  // List of all car positions
+
+	// Generate list of initial car positions
+	carPos := make([]float64, M)
+	for i := 1; i <= M; i++ {
+		carPos[i-1] = float64(i) * di
+	}
+	for i := 0; i < n; i++ {
+		nextCarPos, _ := euler_step(carPos)
+		allCarPos[i] = carPos
+		carPos = nextCarPos
+	}
+
+	generate_car_plots("uppgift3", allCarPos)
 
 }
 
@@ -215,6 +233,7 @@ func run_all() {
 	fmt.Println("Running problem 7 & 8")
 	p1()
 	p2()
+	//p3()
 	p7()
 	p8()
 	p8v2()
