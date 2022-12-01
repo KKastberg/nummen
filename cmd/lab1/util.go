@@ -7,7 +7,6 @@ import (
 	"image/gif"
 	"image/png"
 	"log"
-	"math"
 	"os"
 
 	"gonum.org/v1/plot"
@@ -46,46 +45,31 @@ func plot_position_graphs(name string, allCarPos [][]float64) {
 }
 
 func plot_fix_point_error(errors []float64) {
-	//p := plot.New()
-	//p.Title.Text = "Errors"
-	//p.X.Label.Text = "Iterations"
-	//p.Y.Label.Text = "Error"
-	//p.BackgroundColor = color.Transparent
-	//p.Y.Scale = plot.LogScale{}
-
-	//// Generate data points with f(x)
-	//for i := 0; i < len(errors); i++ {
-
-	//	pts := make(plotter.XYs, len(errors))
-	//	pts[i].X = float64(i)
-	//	pts[i].Y = float64(errors[i])
-
-	//	line, err := plotter.NewLine(pts)
-	//	if err != nil {
-	//		panic(err)
-	//	}
-	//	line.Color = color.RGBA{B: uint8(255 * i / M), A: 255, R: uint8(255 - 255*i/M), G: uint8(255/2 + 255*i/M/2)}
-	//	p.Add(line)
-	//}
-
-	//boxPlot(values)
 	p := plot.New()
-	p.Title.Text = "bar plot"
-	// p.Y.Scale = plot.LogScale{}
+	p.Title.Text = "FPI Precision"
+	p.X.Label.Text = "Iterations"
+	p.Y.Label.Text = "Error"
+	p.BackgroundColor = color.Transparent
+	p.Y.Scale = plot.LogScale{}
+	p.Y.Tick.Marker = plot.LogTicks{Prec: 1}
 
-	
+	pts := make(plotter.XYs, len(errors))
 
-	var values plotter.Values
+	// Generate data points with f(x)
 	for i := 0; i < len(errors); i++ {
-			values = append(values, math.Log10(errors[i]))
+
+		pts[i].X = float64(i)
+		pts[i].Y = (errors[i])
+
 	}
 
-	bar, err := plotter.NewBarChart(values, 15)
+	line, err := plotter.NewLine(pts)
 	if err != nil {
 		panic(err)
 	}
-	p.Add(bar)
 
+	line.Color = color.RGBA{R: 0, G: 0, B: 255, A: 255}
+	p.Add(line)
 
 	if err := p.Save(5*vg.Inch, 5*vg.Inch, "bar.png"); err != nil {
 		panic(err)
