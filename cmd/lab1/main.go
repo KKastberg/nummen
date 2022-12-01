@@ -154,11 +154,14 @@ func p8v2() {
 
 	// Calculate final car positions with fixed point euler x_1(40) for 1-50 fixed point iterations
 	for i := 0; i < max_iter; i++ {
+
 		carPos := initialCarPos[:]
+
 		for j := 0; j < n; j++ {
 			nextCarPos := next_time_step(carPos, i)
 			carPos = nextCarPos
 		}
+
 		abs_error[i] = math.Abs(carPos[0] - ground_truth[0])
 	}
 

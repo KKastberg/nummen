@@ -59,7 +59,7 @@ func plot_fix_point_error(errors []float64) {
 	for i := 0; i < len(errors); i++ {
 
 		pts[i].X = float64(i)
-		pts[i].Y = (errors[i])
+		pts[i].Y = errors[i]
 
 	}
 
@@ -71,7 +71,7 @@ func plot_fix_point_error(errors []float64) {
 	line.Color = color.RGBA{R: 0, G: 0, B: 255, A: 255}
 	p.Add(line)
 
-	if err := p.Save(5*vg.Inch, 5*vg.Inch, "bar.png"); err != nil {
+	if err := p.Save(5*vg.Inch, 5*vg.Inch, "error.png"); err != nil {
 		panic(err)
 	}
 }
