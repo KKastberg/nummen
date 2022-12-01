@@ -213,6 +213,8 @@ func euler_step(carPos []float64) ([]float64, []float64) {
 func run_all() {
 	// fmt.Println("Running problem 1"); p1()
 	fmt.Println("Running problem 7 & 8")
+	p1()
+	p2()
 	p7()
 	p8()
 	p8v2()
