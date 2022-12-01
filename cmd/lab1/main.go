@@ -13,7 +13,7 @@ import (
 const v_max float64 = 25 // Max speed [m/s]
 const d float64 = 75     // Max distance between cars [m]
 const M int = 10         // Count of cars [cars]
-const h float64 = 2.5    // Step size [step]
+const h float64 = 0.1    // Step size [step]
 const t float64 = 40     // Time instant [s]
 const g float64 = 5      // Speed of first car [m/s]
 const di float64 = d     // Initial distances between cars [m]
