@@ -97,7 +97,7 @@ func generate_car_plots(name string, allCarPos [][]float64) {
 		plotutil.AddScatters(p, pts)
 
 		// Save the plot to a PNG file.
-		if err := p.Save(4*vg.Inch, 4*vg.Inch, fmt.Sprintf("gif\\%s_%d.png", name, i)); err != nil {
+		if err := p.Save(4*vg.Inch, 4*vg.Inch, fmt.Sprintf("gif/%s_%d.png", name, i)); err != nil {
 			panic(err)
 		}
 
@@ -113,7 +113,7 @@ func generate_gif(name string, img_count int) {
 
 	for i := 0; i < img_count; i++ {
 		// Open the image file.
-		f, err := os.Open(fmt.Sprintf("gif\\%s_%d.png", name, i))
+		f, err := os.Open(fmt.Sprintf("gif/%s_%d.png", name, i))
 
 		if err != nil {
 			panic(err)
