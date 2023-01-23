@@ -2,7 +2,10 @@ module cmd/lab1
 
 go 1.19
 
-require gonum.org/v1/plot v0.12.0
+require (
+	gonum.org/v1/gonum v0.12.0
+	gonum.org/v1/plot v0.12.0
+)
 
 require (
 	git.sr.ht/~sbinet/gg v0.3.1 // indirect
