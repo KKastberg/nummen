@@ -2,10 +2,13 @@ package main
 
 import (
 	"fmt"
+	"math"
 
 	"gonum.org/v1/gonum/mat"
 )
 
+func print_matrix(matrix *mat.Dense) {
+	var rows, _ = matrix.Dims()
 func p3() {
 	x := mat.NewDense(6, 1, []float64{150, 200, 300, 500, 1000, 2000});
 	y := mat.NewDense(6, 1, []float64{2, 3, 4, 5, 6, 7});
@@ -28,6 +31,14 @@ func p3a5(x *mat.Dense, y *mat.Dense) {
 	least_square(A, b);
 }
 
+	for i := 0; i < rows; i++ {
+		for j := 0; j < rows+1; j++ {
+			fmt.Printf("%f ", matrix.At(i, j))
+		}
+		fmt.Println("\n")
+	}
+
+}
 func p3a6(x *mat.Dense, y *mat.Dense) {
 	// 1/U(x) - 1/8 = a/x
 	A := mat.NewDense(6,1, nil)
@@ -61,14 +72,27 @@ func p2() {
 }
 
 func polynomial_interpolation(a *mat.Dense, b *mat.Dense) {
-	// Create the interpolator
-	print("Polynomial interpolation: \n");
+	var rows, _ = a.Dims()
+	vander_matrix := mat.NewDense(rows, rows+1, nil)
+
+	for row := 0; row < rows; row++ {
+		//A.Set(row, 0, 1) // First column in every row needs to be equal to 1
+		for col := 0; col < rows+1; col++ {
+			vander_matrix.Set(row, col, math.Pow(a.At(row, 0), float64(col)))
+		}
+	}
+
+	print_matrix(vander_matrix)
+
+	 := mat.NewDense(rows+1, 1, nil)
+
+
 }
 
 func least_square(A *mat.Dense, b *mat.Dense) *mat.Dense {
 	_, A_cols := A.Dims();
 	_, b_cols := b.Dims();
-	
+
 	// Create the matrix (A^T*A)^-1
 	A_T_A := mat.NewDense(A_cols, A_cols, nil)
 	A_T_A.Mul(A.T(), A)
@@ -95,6 +119,6 @@ func least_square(A *mat.Dense, b *mat.Dense) *mat.Dense {
 
 // Entry point
 func main() {
-	p3()
+	p2()
 }
 
