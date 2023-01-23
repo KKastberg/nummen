@@ -2,9 +2,13 @@ package main
 
 import (
 	"fmt"
+	"image/color"
 	"math"
 
 	"gonum.org/v1/gonum/mat"
+	"gonum.org/v1/plot"
+	"gonum.org/v1/plot/plotter"
+	"gonum.org/v1/plot/vg"
 )
 
 func print_matrix(matrix *mat.Dense) {
@@ -74,14 +78,74 @@ func p2() {
 		A.Set(i, 0, a.At(i, 0))
 		A.Set(i, 1, a.At(i, 0)*a.At(i, 0))
 	}
-	least_square(A, b)
+	least_vec := least_square(A, b)
 
 	// polynomial interpolation
-	polynomial_interpolation(a, b)
+	coeff_vec := polynomial_interpolation(a, b)
+
+	p := plot.New()
+	p.Title.Text = "Uppgift 2"
+	p.X.Label.Text = "x"
+	p.Y.Label.Text = "y"
+	p.BackgroundColor = color.White
+
+	// Create scatter graph
+	data_points := make(plotter.XYs, 7)
+	for i := range a.RawMatrix().Data {
+		data_points[i].X = a.At(i, 0)
+		data_points[i].Y = b.At(i, 0)
+	}
+	scatter, _ := plotter.NewScatter(data_points)
+
+	// Create polynomial graph
+	polynomial := plotter.NewFunction(func(x float64) float64 {
+		var result float64
+
+		x_1 := coeff_vec.At(1, 0)
+		x_2 := coeff_vec.At(2, 0)
+		x_3 := coeff_vec.At(3, 0)
+		x_4 := coeff_vec.At(4, 0)
+		x_5 := coeff_vec.At(5, 0)
+		x_6 := coeff_vec.At(6, 0)
+
+		result = x_1*x + x_2*math.Pow(x, 2) + x_3*math.Pow(x, 3) + x_4*math.Pow(x, 4) + x_5*math.Pow(x, 5) + x_6*math.Pow(x, 6)
+
+		return result
+
+	})
+	polynomial.Color = color.RGBA{R: 0, G: 0, B: 255, A: 255}
+
+	// Create least-squares graph
+	least_squares_function := plotter.NewFunction(func(x float64) float64 {
+		var result float64
+
+		a := least_vec.At(0, 0)
+		b := least_vec.At(1, 0)
+
+		result = b*math.Pow(x, 2) + a*x
+
+		return result
+
+	})
+	least_squares_function.Color = color.RGBA{R: 255, G: 0, B: 0, A: 255}
+
+	p.Add(scatter, polynomial, least_squares_function, plotter.NewGrid())
+	p.X.Min = 0
+	p.X.Max = 3
+	p.Y.Min = -3
+	p.Y.Max = 4
+
+	p.Legend.Add("Scatter", scatter)
+	p.Legend.Add("Polynomial interpolation", polynomial)
+	p.Legend.Add("Least-squares method", least_squares_function)
+
+	if err := p.Save(8*vg.Inch, 8*vg.Inch, "problem2.png"); err != nil {
+		panic(err)
+	}
 
 }
 
-func polynomial_interpolation(a *mat.Dense, b *mat.Dense) {
+func polynomial_interpolation(a *mat.Dense, b *mat.Dense) mat.VecDense {
 	var rows, _ = a.Dims()
 	vander_matrix := mat.NewDense(rows, rows, nil)
 
@@ -99,9 +163,11 @@ func polynomial_interpolation(a *mat.Dense, b *mat.Dense) {
 	_ = y.CopyVec(b.ColView(0))
 
 	var c mat.VecDense
-
 	c.SolveVec(vander_matrix, y)
+
 	print_vector(c)
+
+	return c
 
 }
 
