@@ -82,7 +82,7 @@ func p3a6a(x *mat.Dense, y *mat.Dense) {
 	}
 	print_matrix(b_)
 
-	X := least_square(A, b_)
+	X, _:= least_square(A, b_)
 	d := X.At(0, 0)
 	b := X.At(1, 0)
 	a := math.Exp(d)
@@ -113,7 +113,7 @@ func p3a6b(x *mat.Dense, y *mat.Dense) {
 		}
 		// print_matrix(b_)
 
-		X := least_square(A, b_)
+		X, _ := least_square(A, b_)
 		fmt.Println(mat.Norm(X, 1))
 
 		if mat.Norm(X, 1) < precision {
