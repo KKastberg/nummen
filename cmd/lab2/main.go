@@ -37,7 +37,12 @@ func p3() {
 	x := mat.NewDense(6, 1, []float64{150, 200, 300, 500, 1000, 2000})
 	y := mat.NewDense(6, 1, []float64{2, 3, 4, 5, 6, 7})
 
-	p3a6(x, y)
+	// p3a5(x, y)
+	// p3a6a(x, y)
+	p3a6b(x, y)
+	// coeff_vec := polynomial_interpolation(x, y)
+	// fmt.Println("coeff_vec=", coeff_vec)
+
 }
 
 func p3a5(x *mat.Dense, y *mat.Dense) {
@@ -58,28 +63,91 @@ func p3a5(x *mat.Dense, y *mat.Dense) {
 	fmt.Println("a=", a)
 }
 
-func p3a6(x *mat.Dense, y *mat.Dense) {
-	// ln(8-y) = ln(a) + cln(x); d := ln(c)
+func p3a6a(x *mat.Dense, y *mat.Dense) {
+	// ln(8-y) = ln(a) + bln(x); d := ln(a)
 	samples, _ := x.Dims()
 
 	A := mat.NewDense(samples, 2, nil)
 	for i := 0; i < samples; i++ {
-		A.Set(i, 0, math.Exp(1))
+		A.Set(i, 0, 1)
 		A.Set(i, 1, math.Log(x.At(i, 0)))
 	}
 	print_matrix(A)
 
-	b := mat.NewDense(samples, 1, nil)
+	b_ := mat.NewDense(samples, 1, nil)
 	for i := 0; i < samples; i++ {
-		b.Set(i, 0, math.Log(8-y.At(i, 0)))
+		b_.Set(i, 0, math.Log(8-y.At(i, 0)))
 	}
-	print_matrix(b)
+	print_matrix(b_)
 
-	X := least_square(A, b)
-	a := X.At(0, 0)
-	c := X.At(1, 0)
-	fmt.Println("a=", a, "c=", c)
+	X := least_square(A, b_)
+	d := X.At(0, 0)
+	b := X.At(1, 0)
+	a := math.Exp(d)
+	fmt.Println("a=", a, "b=", b)
 }
+
+func p3a6b(x *mat.Dense, y *mat.Dense) {
+	// y = 8 - ax^b
+	samples, _ := x.Dims()
+
+	precision := 1e-25
+	max_iterations := 10000
+	a0 := 5.0
+	b0 := 0.1
+
+	for n := 0; n < max_iterations; n++ {
+		A := mat.NewDense(samples, 2, nil)
+		for i := 0; i < samples; i++ {
+			J0, J1 := J(x.At(i, 0), a0, b0)
+			A.Set(i, 0, J0)
+			A.Set(i, 1, J1)
+		}
+		// print_matrix(A)
+		
+		b_ := mat.NewDense(samples, 1, nil)
+		for i := 0; i < samples; i++ {
+			b_.Set(i, 0, y.At(i, 0) - U(x.At(i, 0), a0, b0))
+		}
+		// print_matrix(b_)
+
+		X := least_square(A, b_)
+		fmt.Println(mat.Norm(X, 1))
+
+		if mat.Norm(X, 1) < precision {
+			break
+		}
+
+		a0 = a0 + X.At(0, 0)
+		b0 = b0 + X.At(1, 0)
+	}
+	// fmt.Println(n)
+	fmt.Println("a=", a0, "b=", b0)
+}
+
+func U(x float64, a float64, b float64) float64 {
+	return 8 - a*math.Pow(x, b)
+}
+
+func J(x float64, a float64, b float64) (float64, float64) {
+	return -math.Pow(x, b), -a*math.Log(x)*math.Pow(x, b)
+}
+
+
+
+
+
+// func gaussNewton(x0 *mat.Dense, U func(*mat.Dense), J func(*mat.Dense), precision float64, max_iterations int) {
+// 	x := x0
+// 	for i := 0; i < max_iterations; i++ {
+// 		x1 = x - Jx^-1 * Ux
+// 		if norm(x1-x) < precision {
+// 			break
+// 		}
+// 		x = x1
+// 	}
+// 	return x
+// }
 
 func p2() {
 	a := mat.NewDense(7, 1, []float64{0, 0.5, 1, 1.5, 2, 2.99, 3})
