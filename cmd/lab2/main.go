@@ -54,7 +54,9 @@ func p3a5(x *mat.Dense, y *mat.Dense) {
 		b.Set(i, 0, 1/y.At(i, 0)-1.0/8.0)
 	}
 
-	a := least_square(A, b).At(0, 0)
+	sol, _ := least_square(A, b)
+	a := sol.At(0, 0)
+
 	fmt.Println("a=", a)
 }
 
@@ -75,7 +77,7 @@ func p3a6(x *mat.Dense, y *mat.Dense) {
 	}
 	print_matrix(b)
 
-	X := least_square(A, b)
+	X, _ := least_square(A, b)
 	a := X.At(0, 0)
 	c := X.At(1, 0)
 	fmt.Println("a=", a, "c=", c)
@@ -91,7 +93,7 @@ func p2() {
 		A.Set(i, 0, a.At(i, 0))
 		A.Set(i, 1, a.At(i, 0)*a.At(i, 0))
 	}
-	least_vec := least_square(A, b)
+	least_vec, residual_vec := least_square(A, b)
 
 	// polynomial interpolation
 	coeff_vec := polynomial_interpolation(a, b)
@@ -156,6 +158,23 @@ func p2() {
 		panic(err)
 	}
 
+	// Calculate the errors
+
+	// Finding least-square errors:
+	// 1. Find the magnitude/norm of the residual vector r, ||r||
+	//print_matrix(residual_vec)
+
+	residual_norm := residual_vec.Norm(2)
+
+	// 2. Find the Squared Error SE = ||r||^2
+	squared_error := math.Pow(residual_norm, 2)
+
+	// 3. Root Mean Squared Error: RMSE = sqrt(SE/n)
+	n, _ := residual_vec.Dims()
+	rmse := math.Sqrt(squared_error / float64(n))
+
+	fmt.Printf("The RMSE for least-squares method in problem 2 is: %f\n", rmse)
+
 }
 
 func polynomial_interpolation(a *mat.Dense, b *mat.Dense) mat.VecDense {
@@ -178,14 +197,14 @@ func polynomial_interpolation(a *mat.Dense, b *mat.Dense) mat.VecDense {
 	var c mat.VecDense
 	c.SolveVec(vander_matrix, y)
 
-	print_vector(c)
+	//print_vector(c)
 
 	return c
 
 }
 
-func least_square(A *mat.Dense, b *mat.Dense) *mat.Dense {
-	_, A_cols := A.Dims()
+func least_square(A *mat.Dense, b *mat.Dense) (*mat.Dense, *mat.Dense) {
+	A_rows, A_cols := A.Dims()
 	_, b_cols := b.Dims()
 
 	// Create the matrix (A^T*A)^-1
@@ -202,10 +221,22 @@ func least_square(A *mat.Dense, b *mat.Dense) *mat.Dense {
 	x := mat.NewDense(A_cols, b_cols, nil)
 	x.Mul(A_T_A_inv, A_T_b)
 
-	return x
+	_, x_cols := x.Dims()
+
+	//print_matrix(A)
+	//print_matrix(x)
+
+	Ax := mat.NewDense(A_rows, x_cols, nil)
+	Ax.Mul(A, x)
+
+	residual_vec := mat.NewDense(A_rows, x_cols, nil)
+	residual_vec.Sub(b, Ax)
+
+	return x, residual_vec
 }
 
 // Entry point
 func main() {
-	p3()
+	//p3()
+	p2()
 }
