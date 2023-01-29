@@ -24,11 +24,10 @@ func print_matrix(matrix *mat.Dense) {
 }
 
 func print_vector(vector mat.VecDense) {
-	var rows, _ = vector.Dims()
-
+	var rows, cols = vector.Dims()
+	fmt.Println("Matrix (", rows, "x", cols, "): ")
 	for i := 0; i < rows; i++ {
 		fmt.Printf("%f ", vector.At(i, 0))
-
 	}
 	fmt.Println("")
 }
@@ -37,8 +36,8 @@ func p3() {
 	x := mat.NewDense(6, 1, []float64{150, 200, 300, 500, 1000, 2000})
 	y := mat.NewDense(6, 1, []float64{2, 3, 4, 5, 6, 7})
 
-	// p3a5(x, y)
-	// p3a6a(x, y)
+	//p3a5(x, y)
+	//p3a6a(x, y)
 	p3a6b(x, y)
 	// coeff_vec := polynomial_interpolation(x, y)
 	// fmt.Println("coeff_vec=", coeff_vec)
@@ -59,10 +58,12 @@ func p3a5(x *mat.Dense, y *mat.Dense) {
 		b.Set(i, 0, 1/y.At(i, 0)-1.0/8.0)
 	}
 
-	sol, _ := least_square(A, b)
+	sol, residual_vec := least_square(A, b)
 	a := sol.At(0, 0)
 
-	fmt.Println("a=", a)
+	// mse := mse()
+
+	fmt.Println("a=", a, "rmse=", rmse(residual_vec))
 }
 
 func p3a6a(x *mat.Dense, y *mat.Dense) {
@@ -74,27 +75,25 @@ func p3a6a(x *mat.Dense, y *mat.Dense) {
 		A.Set(i, 0, 1)
 		A.Set(i, 1, math.Log(x.At(i, 0)))
 	}
-	print_matrix(A)
 
 	b_ := mat.NewDense(samples, 1, nil)
 	for i := 0; i < samples; i++ {
 		b_.Set(i, 0, math.Log(8-y.At(i, 0)))
 	}
-	print_matrix(b_)
 
-	X, _:= least_square(A, b_)
+	X, residual_vec:= least_square(A, b_)
 	d := X.At(0, 0)
 	b := X.At(1, 0)
 	a := math.Exp(d)
-	fmt.Println("a=", a, "b=", b)
+	fmt.Println("a=", a, "b=", b, "rmse", rmse(residual_vec))
 }
 
 func p3a6b(x *mat.Dense, y *mat.Dense) {
 	// y = 8 - ax^b
 	samples, _ := x.Dims()
 
-	precision := 1e-25
-	max_iterations := 10000
+	precision := 1e-9999
+	max_iterations := 1000000
 	a0 := 5.0
 	b0 := 0.1
 
@@ -114,7 +113,7 @@ func p3a6b(x *mat.Dense, y *mat.Dense) {
 		// print_matrix(b_)
 
 		X, _ := least_square(A, b_)
-		fmt.Println(mat.Norm(X, 1))
+		// fmt.Println(mat.Norm(X, 1))
 
 		if mat.Norm(X, 1) < precision {
 			break
@@ -165,6 +164,7 @@ func p2() {
 
 	// polynomial interpolation
 	coeff_vec := polynomial_interpolation(a, b)
+	print_vector(coeff_vec)
 
 	p := plot.New()
 	p.Title.Text = "Uppgift 2"
@@ -225,13 +225,16 @@ func p2() {
 	if err := p.Save(8*vg.Inch, 8*vg.Inch, "problem2.png"); err != nil {
 		panic(err)
 	}
+	rmse := rmse(residual_vec)
 
+	fmt.Printf("The RMSE for least-squares method in problem 2 is: %f\n", rmse)
+
+}
+
+func rmse(residual_vec *mat.Dense) float64 {
 	// Calculate the errors
-
 	// Finding least-square errors:
 	// 1. Find the magnitude/norm of the residual vector r, ||r||
-	//print_matrix(residual_vec)
-
 	residual_norm := residual_vec.Norm(2)
 
 	// 2. Find the Squared Error SE = ||r||^2
@@ -241,8 +244,7 @@ func p2() {
 	n, _ := residual_vec.Dims()
 	rmse := math.Sqrt(squared_error / float64(n))
 
-	fmt.Printf("The RMSE for least-squares method in problem 2 is: %f\n", rmse)
-
+	return rmse
 }
 
 func polynomial_interpolation(a *mat.Dense, b *mat.Dense) mat.VecDense {
@@ -256,8 +258,8 @@ func polynomial_interpolation(a *mat.Dense, b *mat.Dense) mat.VecDense {
 		}
 	}
 
-	fmt.Printf("Vander matrix dimensions: %dx%d\n", rows, rows)
-	print_matrix(vander_matrix)
+	// fmt.Printf("Vander matrix dimensions: %dx%d\n", rows, rows)
+	// print_matrix(vander_matrix)
 
 	y := mat.NewVecDense(rows, nil)
 	_ = y.CopyVec(b.ColView(0))
@@ -303,7 +305,15 @@ func least_square(A *mat.Dense, b *mat.Dense) (*mat.Dense, *mat.Dense) {
 	return x, residual_vec
 }
 
+func mse(predictions, actual []float64) float64 {
+	var sumSquaredError float64
+	for i := 0; i < len(predictions); i++ {
+			sumSquaredError += math.Pow(predictions[i]-actual[i], 2)
+	}
+	return sumSquaredError / float64(len(predictions))
+}
+
 // Entry point
 func main() {
-	p3()
+	p2()
 }
